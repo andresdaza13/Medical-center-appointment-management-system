@@ -1,0 +1,110 @@
+// Modelo de persistencia de Piedrazul (PostgreSQL).
+//
+// Este archivo describe TABLAS, no el dominio. Las reglas de negocio viven en
+// src/**/domain. Solo los adaptadores de infraestructura conocen este modelo.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoProfesional {
+  MEDICO
+  TERAPISTA
+}
+
+enum Especialidad {
+  TERAPIA_NEURAL
+  QUIROPRAXIA
+  FISIOTERAPIA
+}
+
+enum Genero {
+  HOMBRE
+  MUJER
+  OTRO
+}
+
+enum EstadoCita {
+  AGENDADA
+  ATENDIDA
+  CANCELADA
+}
+
+model Paciente {
+  id              Int       @id @default(autoincrement())
+  documento       String    @unique
+  nombres         String
+  apellidos       String
+  celular         String
+  genero          Genero    @default(OTRO)
+  fechaNacimiento DateTime? @db.Date
+  email           String?
+  // Usuario de Keycloak (sub del token) cuando el paciente se registra solo.
+  keycloakId      String?   @unique
+  citas           Cita[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Medico {
+  id           Int              @id @default(autoincrement())
+  nombres      String
+  tipo         TipoProfesional
+  especialidad Especialidad
+  activo       Boolean          @default(true)
+  horario      HorarioAtencion?
+  citas        Cita[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model HorarioAtencion {
+  id               Int    @id @default(autoincrement())
+  medicoId         Int    @unique
+  medico           Medico @relation(fields: [medicoId], references: [id], onDelete: Cascade)
+  // Días ISO-8601: 1 = lunes ... 7 = domingo
+  diasAtencion     Int[]
+  horaInicio       String // "HH:mm"
+  horaFin          String // "HH:mm"
+  intervaloMinutos Int
+}
+
+model ConfiguracionGlobal {
+  // Tabla de una sola fila (id = 1)
+  id             Int      @id @default(1)
+  ventanaSemanas Int      @default(4)
+  updatedAt      DateTime @updatedAt
+}
+
+model Cita {
+  id          Int        @id @default(autoincrement())
+  fecha       DateTime   @db.Date
+  hora        String // "HH:mm"
+  estado      EstadoCita @default(AGENDADA)
+  observacion String?
+  pacienteId  Int
+  medicoId    Int
+  paciente    Paciente   @relation(fields: [pacienteId], references: [id])
+  medico      Medico     @relation(fields: [medicoId], references: [id])
+  creadoPor   String // username de Keycloak que registró la cita (trazabilidad)
+
+  // CONCURRENCIA (RNF 4): `activa` vale true mientras la cita no esté cancelada
+  // y NULL cuando se cancela. PostgreSQL considera distintos los NULL dentro de
+  // un índice UNIQUE, así que:
+  //   - dos citas ACTIVAS en el mismo turno chocan (el 2º INSERT falla), y
+  //   - una cita CANCELADA libera el turno sin borrar el historial.
+  activa      Boolean?   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([medicoId, fecha, hora, activa], name: "turno_unico")
+  @@unique([pacienteId, medicoId, fecha, activa], name: "una_cita_por_dia_con_medico")
+  @@index([medicoId, fecha])
+  @@index([pacienteId])
+}

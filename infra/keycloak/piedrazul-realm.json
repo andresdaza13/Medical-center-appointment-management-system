@@ -1,0 +1,213 @@
+{
+  "realm": "piedrazul",
+  "enabled": true,
+  "displayName": "Red de Servicios Médicos Piedrazul",
+  "registrationAllowed": true,
+  "resetPasswordAllowed": false,
+  "rememberMe": false,
+  "verifyEmail": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "bruteForceProtected": true,
+  "failureFactor": 5,
+  "waitIncrementSeconds": 60,
+  "maxFailureWaitSeconds": 900,
+  "permanentLockout": false,
+  "passwordPolicy": "length(8) and digits(1) and notUsername",
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "roles": {
+    "realm": [
+       {
+        "name": "offline_access",
+        "description": "${role_offline-access}"
+      },
+      {
+        "name": "uma_authorization",
+        "description": "${role_uma_authorization}"
+      },
+
+      {
+        "name": "administrador",
+        "description": "Configura el sistema y los profesionales"
+      },
+      {
+        "name": "agendador",
+        "description": "Agenda citas manualmente y consulta agendas"
+      },
+      {
+        "name": "medico",
+        "description": "Médico o terapista: consulta su agenda e historial"
+      },
+      {
+        "name": "paciente",
+        "description": "Agenda sus propias citas desde la web"
+      },
+      {
+        "name": "default-roles-piedrazul",
+        "description": "Roles por defecto de usuarios nuevos",
+        "composite": true,
+        "composites": {
+          "realm": [
+            "offline_access",
+            "uma_authorization",
+            "paciente"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultRole": {
+    "name": "default-roles-piedrazul",
+    "composite": true,
+    "clientRole": false
+  },
+  "clients": [
+    {
+      "clientId": "piedrazul-api",
+      "name": "API Piedrazul (audiencia)",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false
+    },
+    {
+      "clientId": "piedrazul-web",
+      "name": "SPA Piedrazul",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "rootUrl": "http://localhost:5173",
+      "redirectUris": [
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "audience-piedrazul-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "piedrazul-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "piedrazul-postman",
+      "name": "Pruebas con Postman (solo desarrollo)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "audience-piedrazul-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "piedrazul-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin.piedrazul",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "admin.piedrazul@piedrazul.test",
+      "firstName": "Admin",
+      "lastName": "Piedrazul",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Piedrazul2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-piedrazul",
+        "administrador"
+      ]
+    },
+    {
+      "username": "agendador1",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "agendador1@piedrazul.test",
+      "firstName": "Ibis",
+      "lastName": "Gonzalez",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Piedrazul2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-piedrazul",
+        "agendador"
+      ]
+    },
+    {
+      "username": "medico1",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "medico1@piedrazul.test",
+      "firstName": "Clara",
+      "lastName": "Cordoba",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Piedrazul2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-piedrazul",
+        "medico"
+      ]
+    },
+    {
+      "username": "paciente1",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "paciente1@piedrazul.test",
+      "firstName": "Lucy",
+      "lastName": "Chavez",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Piedrazul2026",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-piedrazul",
+        "paciente"
+      ]
+    }
+  ]
+}

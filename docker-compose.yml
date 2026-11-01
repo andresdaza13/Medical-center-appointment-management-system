@@ -1,0 +1,41 @@
+# Entorno de desarrollo de Piedrazul.
+# Levanta la infraestructura (base de datos + servidor de identidad).
+# El backend (NestJS) y el frontend (Vite) se ejecutan en la máquina local.
+#
+#   docker compose up -d
+#
+services:
+  postgres:
+    image: postgres:16
+    container_name: piedrazul-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: piedrazul-keycloak
+    restart: unless-stopped
+    # --import-realm carga infra/keycloak/piedrazul-realm.json al arrancar:
+    # roles, clientes y usuarios de prueba quedan listos sin pasos manuales.
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_ADMIN}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./infra/keycloak:/opt/keycloak/data/import:ro
+
+volumes:
+  pgdata:

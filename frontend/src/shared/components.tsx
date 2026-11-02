@@ -3,16 +3,14 @@ import { pacientesApi } from '../core/http/api';
 import { CitaDetalle, ESPECIALIDADES, EstadoCita, Medico, SugerenciaPaciente } from '../core/types';
 import { fechaLarga, hora12 } from './fechas';
 import { mensajeDe, useDebounce } from './hooks';
+import { Icono } from './iconos';
 
-// ---------------------------------------------------------------------------
-// Mensajes de retroalimentación (RNF usabilidad: "retroalimentación visual
-// ante errores o acciones exitosas"). role="alert" lo anuncia a lectores de pantalla.
-// ---------------------------------------------------------------------------
 export function Alerta({ tipo, children }: { tipo: 'error' | 'exito' | 'info'; children: ReactNode }) {
   if (!children) return null;
   return (
     <div className={`alerta alerta-${tipo}`} role={tipo === 'error' ? 'alert' : 'status'}>
-      {children}
+      <Icono nombre={tipo === 'exito' ? 'check' : 'alerta'} />
+      <div>{children}</div>
     </div>
   );
 }
@@ -31,9 +29,7 @@ export function EstadoBadge({ estado }: { estado: EstadoCita }) {
   return <span className={`badge badge-${estado.toLowerCase()}`}>{ETIQUETA_ESTADO[estado]}</span>;
 }
 
-// ---------------------------------------------------------------------------
-// Selector de médico reutilizado en agenda, configuración y agendamiento.
-// ---------------------------------------------------------------------------
+
 export function SelectorMedico(props: {
   medicos: Medico[];
   valor?: number;

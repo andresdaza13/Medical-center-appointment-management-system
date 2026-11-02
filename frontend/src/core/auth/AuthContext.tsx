@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [usuario]);
 
   if (error) return <div className="pantalla-centro alerta alerta-error">{error}</div>;
-  if (!valor) return <div className="pantalla-centro">Cargando…</div>;
+  if (!valor) return <div className="pantalla-centro">Verificando su sesión…</div>;
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>;
 }
 

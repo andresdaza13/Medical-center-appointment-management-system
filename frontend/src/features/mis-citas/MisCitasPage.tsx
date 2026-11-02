@@ -5,6 +5,7 @@ import { CitaDetalle } from '../../core/types';
 import { Alerta, Cargando, TablaCitas } from '../../shared/components';
 import { hoyIso } from '../../shared/fechas';
 import { mensajeDe, useCarga } from '../../shared/hooks';
+import { Icono } from '../../shared/iconos';
 
 export function MisCitasPage() {
   const citas = useCarga(() => citasApi.misCitas(), []);
@@ -27,8 +28,8 @@ export function MisCitasPage() {
     <section>
       <header className="encabezado-pagina">
         <h1>Mis citas</h1>
-        <Link className="boton" to="/agendar">
-          + Agendar cita
+                <Link className="boton" to="/agendar">
+          <Icono nombre="mas" /> Agendar cita
         </Link>
       </header>
       {msg && <Alerta tipo={msg.tipo}>{msg.texto}</Alerta>}

@@ -85,7 +85,9 @@ function Profesionales() {
         <SelectorMedico medicos={medicos.datos ?? []} valor={medicoId} onChange={setMedicoId} />
       )}
 
-      {medico && <EditorHorario key={medico.id} medico={medico} onGuardado={actualizarEnLista} />}
+      {medico && <EditorHorario key={medico.id} medico={medico} onGuardado={actualizarEnLista} />
+       
+      }
 
       <NuevoProfesional
         onCreado={(m) => {
@@ -130,8 +132,9 @@ function EditorHorario({ medico, onGuardado }: { medico: Medico; onGuardado: (m:
   return (
     <form className="subtarjeta" onSubmit={guardar}>
       <div className="encabezado-pagina">
-        <h3>
-          {medico.nombres} · {ESPECIALIDADES[medico.especialidad]}
+          <h3>
+          {medico.nombres}
+          <small className="texto-suave"> {ESPECIALIDADES[medico.especialidad]}</small>
         </h3>
         <button type="button" className={`boton pequeno ${medico.activo ? 'peligro' : 'secundario'}`} onClick={cambiarEstado}>
           {medico.activo ? 'Desactivar' : 'Activar'}

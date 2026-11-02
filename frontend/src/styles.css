@@ -1,141 +1,407 @@
 /*
- * Estilos de Piedrazul.
- * Pensados para usuarios con poca experiencia técnica (RNF usabilidad):
- * letra grande, alto contraste, botones amplios y foco visible al usar teclado.
+ * Piedrazul · sistema visual
+ *
+ * Inspirado en las guías de interfaz de Apple (HIG): mucho aire, jerarquía por
+ * tamaño y peso tipográfico (no por bordes ni sombras), listas agrupadas como
+ * en Ajustes de iOS y controles segmentados.
+ *
+ * El acento es "azul piedra": más sobrio que el azul eléctrico de Apple para
+ * transmitir calma clínica y confianza. Verde y rojo solo comunican estados.
+ *
+ * Público: personas con poca experiencia técnica → texto de 16–17 px, áreas
+ * de clic de 44 px mínimo (recomendación de Apple), foco visible al usar teclado.
  */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --azul: #1d4ed8;
-  --azul-oscuro: #1e3a8a;
-  --azul-suave: #e8efff;
-  --verde: #15803d;
-  --verde-suave: #e7f6ec;
-  --rojo: #b91c1c;
-  --rojo-suave: #fdecec;
-  --ambar-suave: #fff7e0;
-  --texto: #1f2933;
-  --texto-suave: #5b6672;
-  --borde: #d5dbe3;
-  --fondo: #f4f6f9;
-  --tarjeta: #ffffff;
-  --radio: 10px;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  font-size: 17px;
-  line-height: 1.5;
+  /* Color */
+  --fondo: #f5f5f7;
+  --superficie: #ffffff;
+  --texto: #1d1d1f;
+  --texto-2: #6e6e73;
+  --texto-3: #86868b;
+  --separador: rgba(60, 60, 67, 0.14);
+  --relleno: rgba(118, 118, 128, 0.12); /* fondo de controles (iOS "fill") */
+  --acento: #1e5bb8;
+  --acento-hover: #174a99;
+  --acento-suave: rgba(30, 91, 184, 0.1);
+  --exito: #1f7a3a;
+  --exito-suave: rgba(36, 138, 61, 0.1);
+  --peligro: #c4161c;
+  --peligro-suave: rgba(215, 0, 21, 0.08);
+  --aviso-suave: rgba(255, 159, 10, 0.14);
+  --lateral: rgba(246, 246, 248, 0.82);
+
+  /* Forma */
+  --radio-grupo: 14px;
+  --radio-control: 10px;
+  --sombra-grupo: 0 1px 2px rgba(0, 0, 0, 0.04), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+
+  /* Tipografía */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.47;
+  letter-spacing: -0.011em;
   color: var(--texto);
   background: var(--fondo);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'cv11', 'ss01'; /* Inter: dígitos y "a" más sobrios */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #000000;
+    --superficie: #1c1c1e;
+    --texto: #f5f5f7;
+    --texto-2: #a1a1a6;
+    --texto-3: #8e8e93;
+    --separador: rgba(84, 84, 88, 0.55);
+    --relleno: rgba(118, 118, 128, 0.24);
+    --acento: #5b9bf5;
+    --acento-hover: #7aaff7;
+    --acento-suave: rgba(91, 155, 245, 0.16);
+    --exito: #30d158;
+    --exito-suave: rgba(48, 209, 88, 0.14);
+    --peligro: #ff6961;
+    --peligro-suave: rgba(255, 69, 58, 0.14);
+    --lateral: rgba(28, 28, 30, 0.8);
+    --sombra-grupo: none;
+  }
 }
 
 * { box-sizing: border-box; }
 body { margin: 0; }
-h1 { font-size: 1.6rem; margin: 0; }
-h2 { font-size: 1.2rem; margin: 0 0 0.75rem; }
-h3 { font-size: 1.05rem; margin: 0.75rem 0 0.5rem; }
-a { color: var(--azul); }
+img, svg { display: block; }
+a { color: var(--acento); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
-:focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
+:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
 
 .saltar { position: absolute; left: -999px; }
-.saltar:focus { left: 1rem; top: 1rem; background: #fff; padding: 0.5rem; z-index: 10; }
+.saltar:focus { left: 1rem; top: 1rem; z-index: 50; background: var(--superficie); padding: 0.6rem 1rem; }
 
-/* ---- Estructura ---------------------------------------------------------- */
-.barra {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
-  padding: 0.75rem 1.5rem; background: var(--azul-oscuro); color: #fff;
+/* ---------------------------------------------------------------------------
+ * Tipografía: la jerarquía la marcan tamaño y peso
+ * ------------------------------------------------------------------------- */
+h1 { font-size: 2.125rem; line-height: 1.12; font-weight: 700; letter-spacing: -0.026em; margin: 0; }
+h2 { font-size: 1.25rem; line-height: 1.25; font-weight: 600; letter-spacing: -0.017em; margin: 0 0 0.9rem; }
+h3 { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.014em; margin: 1.5rem 0 0.75rem; }
+small, .ayuda { color: var(--texto-2); font-size: 0.875rem; }
+.texto-suave { color: var(--texto-2); }
+
+/* ---------------------------------------------------------------------------
+ * Estructura: barra lateral translúcida (macOS) + contenido
+ * ------------------------------------------------------------------------- */
+.app { display: grid; grid-template-columns: 264px 1fr; min-height: 100vh; }
+
+.lateral {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem 0.875rem 1.25rem;
+  background: var(--lateral);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-right: 0.5px solid var(--separador);
 }
-.marca { font-weight: 700; font-size: 1.1rem; }
-.barra nav { display: flex; flex-wrap: wrap; gap: 0.25rem; flex: 1; }
-.barra nav a { color: #dbe6ff; text-decoration: none; padding: 0.4rem 0.75rem; border-radius: 6px; }
-.barra nav a.active, .barra nav a:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
-.usuario { display: flex; align-items: center; gap: 0.75rem; }
 
-main { max-width: 1150px; margin: 0 auto; padding: 1.5rem; }
-.angosta { max-width: 640px; margin: 0 auto; }
-.pantalla-centro { display: grid; place-items: center; min-height: 100vh; }
+.marca { display: flex; align-items: center; gap: 0.75rem; padding: 0 0.5rem; }
+.marca-logo {
+  display: grid; place-items: center;
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(160deg, #3a7bd5 0%, #1e5bb8 55%, #163f80 100%);
+  color: #fff;
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.35);
+}
+.marca-logo .icono { width: 22px; height: 22px; }
+.marca strong { display: block; font-size: 1.0625rem; letter-spacing: -0.02em; }
+.marca small { display: block; font-size: 0.8125rem; line-height: 1.2; }
 
-.encabezado-pagina { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-.tarjeta { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); padding: 1.25rem; margin-bottom: 1rem; }
-.subtarjeta { border-top: 1px solid var(--borde); margin-top: 1rem; padding-top: 0.5rem; }
+.menu { display: flex; flex-direction: column; gap: 2px; }
+.menu a {
+  display: flex; align-items: center; gap: 0.7rem;
+  min-height: 40px; padding: 0 0.75rem;
+  border-radius: 8px;
+  color: var(--texto);
+  font-size: 0.9375rem; font-weight: 500;
+  text-decoration: none;
+}
+.menu a .icono { width: 20px; height: 20px; color: var(--acento); }
+.menu a:hover { background: var(--relleno); }
+.menu a.active { background: var(--acento); color: #fff; }
+.menu a.active .icono { color: #fff; }
 
-/* ---- Formularios --------------------------------------------------------- */
-.filtros { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
-.campo { display: flex; flex-direction: column; gap: 0.3rem; min-width: 220px; margin-bottom: 0.75rem; }
-.campo label { font-weight: 600; font-size: 0.95rem; }
+.cuenta { margin-top: auto; display: flex; flex-direction: column; gap: 0.85rem; padding: 0 0.25rem; }
+.sesion-segura {
+  display: flex; align-items: center; gap: 0.45rem;
+  margin: 0; padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  background: var(--exito-suave);
+  color: var(--exito);
+  font-size: 0.8125rem; font-weight: 600;
+}
+.sesion-segura .icono { width: 15px; height: 15px; }
+.usuario { display: flex; align-items: center; gap: 0.7rem; }
+.avatar {
+  display: grid; place-items: center; flex: none;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(180deg, #a1a1a6, #7c7c80);
+  color: #fff; font-size: 0.8125rem; font-weight: 600;
+}
+.usuario-datos { min-width: 0; }
+.usuario-datos strong { display: block; font-size: 0.875rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.usuario-datos small { display: block; font-size: 0.75rem; }
+
+main { padding: 3rem clamp(1.25rem, 4vw, 3.5rem) 4rem; max-width: 1040px; width: 100%; }
+.angosta { max-width: 600px; }
+.pantalla-centro { display: grid; place-items: center; min-height: 100vh; color: var(--texto-2); }
+
+.encabezado-pagina {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem;
+  margin-bottom: 2rem;
+}
+.encabezado-pagina h3 { margin: 0; }
+
+/* ---------------------------------------------------------------------------
+ * Grupos (listas agrupadas de iOS): el contenedor principal de cada sección
+ * ------------------------------------------------------------------------- */
+.tarjeta {
+  background: var(--superficie);
+  border-radius: var(--radio-grupo);
+  box-shadow: var(--sombra-grupo);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.subtarjeta { border-top: 0.5px solid var(--separador); margin-top: 1.5rem; padding-top: 0.25rem; }
+.confirmacion { box-shadow: 0 0 0 2px var(--acento), var(--sombra-grupo); }
+
+/* ---------------------------------------------------------------------------
+ * Formularios
+ * ------------------------------------------------------------------------- */
+.filtros { display: flex; flex-wrap: wrap; gap: 1rem 1.25rem; align-items: flex-end; }
+.campo { display: flex; flex-direction: column; gap: 0.4rem; flex: 1 1 220px; margin-bottom: 1rem; }
+.filtros .campo { margin-bottom: 0; }
+.campo label, legend { font-size: 0.875rem; font-weight: 500; color: var(--texto-2); }
+
 input, select, textarea {
-  font: inherit; padding: 0.55rem 0.7rem; border: 1px solid var(--borde); border-radius: 8px; background: #fff;
+  font: inherit; font-size: 1rem; color: var(--texto);
+  min-height: 44px;
+  padding: 0.6rem 0.85rem;
+  border: none;
+  border-radius: var(--radio-control);
+  background: var(--relleno);
+  transition: box-shadow 0.15s, background 0.15s;
 }
-.formulario .campo { min-width: 0; }
-fieldset { border: none; padding: 0; margin: 0.5rem 0 1rem; }
-legend { font-weight: 600; margin-bottom: 0.4rem; }
+input:hover, select:hover, textarea:hover { background: rgba(118, 118, 128, 0.16); }
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  background: var(--superficie);
+  box-shadow: 0 0 0 3px var(--acento-suave), 0 0 0 1px var(--acento);
+}
+input:user-invalid { box-shadow: 0 0 0 1px var(--peligro); }
+select {
+  appearance: none;
+  padding-right: 2.2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%2386868b' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+}
+textarea { resize: vertical; }
+.formulario .campo { flex-basis: 100%; }
+fieldset { border: none; padding: 0; margin: 0.75rem 0 1.25rem; }
+legend { margin-bottom: 0.6rem; }
+
 .dias { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.chip { display: flex; gap: 0.35rem; align-items: center; padding: 0.35rem 0.7rem; border: 1px solid var(--borde); border-radius: 999px; cursor: pointer; }
-.ayuda { color: var(--texto-suave); font-size: 0.9rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  min-height: 36px; padding: 0 0.9rem;
+  border-radius: 999px;
+  background: var(--relleno);
+  font-size: 0.9375rem; cursor: pointer; user-select: none;
+}
+.chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip:has(input:checked) { background: var(--acento); color: #fff; }
+.chip:has(input:focus-visible) { outline: 3px solid var(--acento); outline-offset: 2px; }
 
-/* ---- Botones ------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+ * Botones
+ * ------------------------------------------------------------------------- */
 .boton {
-  display: inline-block; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none;
-  background: var(--azul); color: #fff; border: 1px solid var(--azul); border-radius: 8px; padding: 0.55rem 1.1rem;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+  min-height: 44px; padding: 0 1.25rem;
+  font: inherit; font-size: 0.9375rem; font-weight: 600;
+  border: none; border-radius: 980px; /* píldora, como los botones de apple.com */
+  background: var(--acento); color: #fff;
+  cursor: pointer; text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
 }
-.boton:hover { background: var(--azul-oscuro); }
-.boton:disabled { opacity: 0.5; cursor: not-allowed; }
-.boton.secundario { background: #fff; color: var(--azul); }
-.boton.secundario:hover { background: var(--azul-suave); }
-.boton.peligro { background: #fff; color: var(--rojo); border-color: var(--rojo); }
-.boton.peligro:hover { background: var(--rojo-suave); }
-.boton.pequeno { padding: 0.3rem 0.7rem; font-size: 0.9rem; }
-.boton.grande { padding: 0.8rem 1.6rem; font-size: 1.05rem; }
-.enlace { background: none; border: none; color: var(--azul); text-decoration: underline; cursor: pointer; font: inherit; }
+.boton:hover { background: var(--acento-hover); text-decoration: none; }
+.boton:active { transform: scale(0.98); }
+.boton:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.boton .icono { width: 18px; height: 18px; }
+.boton.secundario { background: var(--relleno); color: var(--acento); }
+.boton.secundario:hover { background: rgba(118, 118, 128, 0.2); }
+.boton.peligro { background: transparent; color: var(--peligro); }
+.boton.peligro:hover { background: var(--peligro-suave); }
+.boton.pequeno { min-height: 32px; padding: 0 0.85rem; font-size: 0.875rem; }
+.boton.grande { min-height: 50px; padding: 0 2rem; font-size: 1.0625rem; }
+.boton.bloque { width: 100%; }
+.enlace { background: none; border: none; padding: 0; color: var(--acento); font: inherit; font-weight: 600; cursor: pointer; }
 
-/* ---- Agendamiento -------------------------------------------------------- */
-.opciones-grandes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; }
+/* ---------------------------------------------------------------------------
+ * Agendamiento: control segmentado + franjas
+ * ------------------------------------------------------------------------- */
+.opciones-grandes {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  padding: 3px; border-radius: 12px;
+  background: var(--relleno);
+}
 .opcion {
-  font: inherit; font-size: 1.05rem; padding: 1rem; border: 2px solid var(--borde); border-radius: var(--radio);
-  background: #fff; cursor: pointer; text-align: center;
+  min-height: 48px;
+  font: inherit; font-size: 1rem; font-weight: 500; color: var(--texto);
+  border: none; border-radius: 9px; background: transparent;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
 }
-.opcion.seleccionada, .franja.seleccionada { border-color: var(--azul); background: var(--azul-suave); }
-.franjas { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.opcion:hover:not(.seleccionada) { background: rgba(255, 255, 255, 0.5); }
+.opcion.seleccionada {
+  background: var(--superficie);
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04);
+}
+
+.franjas { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 0.5rem; margin-bottom: 0.5rem; }
+.franjas:has(.ancha) { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 .franja {
-  font: inherit; padding: 0.5rem 0.9rem; border: 2px solid var(--borde); border-radius: 8px; background: #fff; cursor: pointer;
+  min-height: 44px; padding: 0.5rem 0.75rem;
+  font: inherit; font-size: 0.9375rem; font-weight: 500; color: var(--acento);
+  border: none; border-radius: var(--radio-control);
+  background: var(--acento-suave);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
-.franja.ancha { display: flex; flex-direction: column; align-items: flex-start; min-width: 220px; text-align: left; }
-.franja.ancha span { text-transform: capitalize; font-size: 0.9rem; }
-.franja.ancha small { color: var(--texto-suave); }
-.otra-fecha { margin-top: 1rem; }
-.otra-fecha summary { cursor: pointer; color: var(--azul); font-weight: 600; margin-bottom: 0.75rem; }
-.confirmacion { border: 2px solid var(--azul); }
+.franja:hover { background: rgba(30, 91, 184, 0.16); }
+.franja.seleccionada { background: var(--acento); color: #fff; }
+.franja.ancha {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem;
+  padding: 0.8rem 1rem; text-align: left; color: var(--texto);
+  background: var(--relleno);
+}
+.franja.ancha span { font-size: 0.8125rem; color: var(--texto-2); }
+.franja.ancha span::first-letter { text-transform: uppercase; }
+.franja.ancha strong { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; }
+.franja.ancha small { font-size: 0.8125rem; }
+.franja.ancha.seleccionada { background: var(--acento); color: #fff; }
+.franja.ancha.seleccionada span, .franja.ancha.seleccionada small { color: rgba(255, 255, 255, 0.85); }
 
-/* ---- Autocompletado ------------------------------------------------------ */
-.autocompletar { position: relative; max-width: 420px; }
+.otra-fecha { margin-top: 1.5rem; border-top: 0.5px solid var(--separador); padding-top: 1rem; }
+.otra-fecha summary {
+  cursor: pointer; list-style: none;
+  color: var(--acento); font-weight: 600; font-size: 0.9375rem;
+}
+.otra-fecha summary::-webkit-details-marker { display: none; }
+.otra-fecha summary::after { content: '›'; display: inline-block; margin-left: 0.4rem; transition: transform 0.2s; }
+.otra-fecha[open] summary::after { transform: rotate(90deg); }
+.otra-fecha[open] summary { margin-bottom: 1.25rem; }
+
+/* ---------------------------------------------------------------------------
+ * Autocompletado
+ * ------------------------------------------------------------------------- */
+.autocompletar { position: relative; max-width: 440px; }
 .sugerencias {
-  position: absolute; top: 100%; left: 0; right: 0; z-index: 5; list-style: none; margin: 0; padding: 0;
-  background: #fff; border: 1px solid var(--borde); border-radius: 8px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 20;
+  list-style: none; margin: 0; padding: 6px;
+  background: var(--superficie);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 0 0 0.5px var(--separador);
 }
-.sugerencias li { padding: 0.55rem 0.75rem; cursor: pointer; }
-.sugerencias li.activa, .sugerencias li:hover { background: var(--azul-suave); }
+.sugerencias li { padding: 0.65rem 0.75rem; border-radius: 8px; cursor: pointer; }
+.sugerencias li strong { font-variant-numeric: tabular-nums; margin-right: 0.5rem; }
+.sugerencias li.activa, .sugerencias li:hover { background: var(--acento); color: #fff; }
 
-/* ---- Tablas y estados ---------------------------------------------------- */
-.tabla-contenedor { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-th, td { text-align: left; padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--borde); vertical-align: top; }
-th { background: var(--fondo); font-size: 0.9rem; }
-td:first-letter { text-transform: capitalize; }
-tr.tachada td { color: var(--texto-suave); }
-.resumen-agenda { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-.contador { font-size: 1.1rem; }
+/* ---------------------------------------------------------------------------
+ * Tablas: filas separadas por líneas finas, sin rejilla
+ * ------------------------------------------------------------------------- */
+.tabla-contenedor { overflow-x: auto; margin: 0 -1.5rem -1.5rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+th {
+  text-align: left; font-size: 0.8125rem; font-weight: 500; color: var(--texto-2);
+  padding: 0.6rem 0.75rem; border-bottom: 0.5px solid var(--separador);
+}
+td { padding: 0.85rem 0.75rem; border-bottom: 0.5px solid var(--separador); vertical-align: top; }
+th:first-child, td:first-child { padding-left: 1.5rem; }
+th:last-child, td:last-child { padding-right: 1.5rem; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(118, 118, 128, 0.05); }
+td:first-child { font-variant-numeric: tabular-nums; font-weight: 500; }
+td small { color: var(--texto-2); }
+tr.tachada td { color: var(--texto-3); }
+
+.resumen-agenda {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.resumen-agenda strong { font-size: 1.0625rem; }
+.contador { display: flex; align-items: baseline; gap: 0.4rem; color: var(--texto-2); font-size: 0.875rem; }
+.contador strong { font-size: 1.75rem; font-weight: 700; color: var(--texto); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .acciones { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.texto-suave { color: var(--texto-suave); text-transform: capitalize; }
 
-.badge { padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; }
-.badge-agendada { background: var(--azul-suave); color: var(--azul-oscuro); }
-.badge-atendida { background: var(--verde-suave); color: var(--verde); }
-.badge-cancelada { background: var(--rojo-suave); color: var(--rojo); }
-
-.alerta { padding: 0.75rem 1rem; border-radius: 8px; margin: 0.75rem 0; border-left: 5px solid; }
-.alerta-error { background: var(--rojo-suave); border-color: var(--rojo); }
-.alerta-exito { background: var(--verde-suave); border-color: var(--verde); }
-.alerta-info { background: var(--ambar-suave); border-color: #d97706; }
-.vacio, .cargando { color: var(--texto-suave); padding: 0.75rem 0; }
-
-@media (max-width: 640px) {
-  main { padding: 1rem; }
-  .campo { min-width: 100%; }
+.badge {
+  display: inline-block; padding: 0.15rem 0.6rem;
+  border-radius: 999px; font-size: 0.8125rem; font-weight: 600; white-space: nowrap;
 }
+.badge-agendada { background: var(--acento-suave); color: var(--acento); }
+.badge-atendida { background: var(--exito-suave); color: var(--exito); }
+.badge-cancelada { background: var(--relleno); color: var(--texto-2); }
+
+/* ---------------------------------------------------------------------------
+ * Mensajes
+ * ------------------------------------------------------------------------- */
+.alerta {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  margin: 0 0 1.25rem; padding: 0.85rem 1rem;
+  border-radius: 12px; font-size: 0.9375rem;
+}
+.alerta .icono { flex: none; width: 20px; height: 20px; margin-top: 1px; }
+.alerta-error { background: var(--peligro-suave); color: var(--peligro); }
+.alerta-exito { background: var(--exito-suave); color: var(--exito); }
+.alerta-info { background: var(--aviso-suave); color: #8a4b00; }
+.alerta-exito .enlace { color: inherit; text-decoration: underline; }
+.vacio, .cargando { color: var(--texto-2); padding: 1rem 0; margin: 0; }
+
+/* Anuncio breve del cambio de estado (respuesta a una acción del usuario) */
+@keyframes aparecer { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.alerta, .confirmacion { animation: aparecer 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Móvil: la barra lateral pasa a ser una barra superior
+ * ------------------------------------------------------------------------- */
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; }
+  .lateral {
+    position: sticky; height: auto; z-index: 30;
+    flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-right: none; border-bottom: 0.5px solid var(--separador);
+  }
+  .menu { flex-direction: row; overflow-x: auto; order: 3; width: 100%; }
+  .menu a { white-space: nowrap; }
+  .cuenta { margin: 0 0 0 auto; flex-direction: row; align-items: center; }
+  .sesion-segura, .usuario-datos { display: none; }
+  .cuenta .boton { width: auto; }
+  main { padding: 1.75rem 1rem 3rem; }
+  h1 { font-size: 1.75rem; }
+  .opciones-grandes { grid-auto-flow: row; }
+  .encabezado-pagina { align-items: flex-start; flex-direction: column; }
+}
+.primera-mayuscula::first-letter { text-transform: uppercase; }

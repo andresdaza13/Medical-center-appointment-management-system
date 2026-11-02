@@ -6,6 +6,7 @@ import { CitaDetalle } from '../../core/types';
 import { Alerta, Cargando, SelectorMedico, TablaCitas } from '../../shared/components';
 import { fechaLarga, hoyIso } from '../../shared/fechas';
 import { mensajeDe, useCarga } from '../../shared/hooks';
+import { Icono } from '../../shared/iconos';
 
 /**
  * RF1: listar las citas de un médico en una fecha (búsqueda con filtros y
@@ -52,8 +53,8 @@ export function AgendaPage() {
       <header className="encabezado-pagina">
         <h1>Agenda del día</h1>
         {tieneRol('agendador', 'administrador', 'medico') && (
-          <Link className="boton" to="/agendar">
-            + Nueva cita
+                  <Link className="boton" to="/agendar">
+            <Icono nombre="mas" /> Nueva cita
           </Link>
         )}
       </header>
@@ -80,17 +81,17 @@ export function AgendaPage() {
           <div className="resumen-agenda">
             <div>
               <strong>{agenda.datos.medico.nombres}</strong>
-              <span className="texto-suave"> · {fechaLarga(agenda.datos.fecha)}</span>
+              <div className="texto-suave primera-mayuscula">{fechaLarga(agenda.datos.fecha)}</div>
             </div>
             <div className="contador" aria-live="polite">
-              Total citas: <strong>{agenda.datos.total}</strong>
+              <strong>{agenda.datos.total}</strong> {agenda.datos.total === 1 ? 'cita' : 'citas'}
             </div>
             <div className="acciones">
-              <button className="boton secundario" onClick={() => exportar('csv')} disabled={agenda.datos.total === 0}>
-                Exportar CSV
+                            <button className="boton secundario" onClick={() => exportar('csv')} disabled={agenda.datos.total === 0}>
+                <Icono nombre="descargar" /> Exportar CSV
               </button>
               <button className="boton secundario" onClick={() => exportar('txt')} disabled={agenda.datos.total === 0}>
-                Listado para imprimir
+                Versión para imprimir
               </button>
             </div>
           </div>

@@ -39,15 +39,14 @@ export function HistorialPage() {
       {historial && (
         <div className="tarjeta">
           <div className="resumen-agenda">
-            <div>
+               <div>
               <strong>{historial.paciente.nombreCompleto}</strong>
-              <span className="texto-suave">
-                {' '}
-                · C.C. {historial.paciente.documento} · Cel. {historial.paciente.celular}
-              </span>
+              <div className="texto-suave">
+                C.C. {historial.paciente.documento}, celular {historial.paciente.celular}
+              </div>
             </div>
             <div className="contador">
-              Citas registradas: <strong>{historial.total}</strong>
+              <strong>{historial.total}</strong> {historial.total === 1 ? 'cita' : 'citas'}
             </div>
           </div>
           <TablaCitas

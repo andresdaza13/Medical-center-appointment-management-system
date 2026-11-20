@@ -87,8 +87,7 @@ export class AgendarCitaService {
     return this.citas.guardar(cita);
   }
 
-  async cancelar(usuario: UsuarioAutenticado, citaId: number): Promise<Cita> {
-    const cita = await this.citas.buscarPorId(citaId);
+  async cancelar(usuario: UsuarioAutenticado, citaId: number, justificacion: string): Promise<Cita> {    const cita = await this.citas.buscarPorId(citaId);
     if (!cita) throw new RecursoNoEncontradoError('Cita', citaId);
 
     // Un paciente solo puede cancelar SUS citas (control de acceso a nivel de
@@ -98,7 +97,9 @@ export class AgendarCitaService {
       if (propio.id !== cita.pacienteId) throw new AccesoDenegadoError('Solo puede cancelar sus propias citas');
     }
 
-    cita.cancelar(this.reloj.hoy());
+      // Las reglas (2 días, justificación) las decide la entidad; aquí solo se
+    // traduce "quién cancela" al lenguaje del dominio.
+    cita.cancelar({ hoy: this.reloj.hoy(), justificacion, esAutonoma: !usuario.esPersonal() });
     return this.citas.guardar(cita);
   }
 

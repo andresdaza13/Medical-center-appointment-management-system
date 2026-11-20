@@ -109,26 +109,44 @@ describe('AgendarCitaService', () => {
     expect(citas.datos.filter((c) => c.hora.toString() === '07:40')).toHaveLength(1);
   });
 
-  describe('cancelar', () => {
-    it('el paciente cancela su cita y el turno queda libre otra vez', async () => {
+   describe('cancelar (RF6)', () => {
+    // El reloj fijo marca el lunes 2026-11-02.
+    const motivo = 'Viaje de trabajo imprevisto';
+
+    it('el paciente cancela su cita con 2 días de anticipación y el turno queda libre', async () => {
       const { agendar, citas } = escenario();
       const cita = citas.sembrar(1, 10, '2026-11-04', '07:00');
-      await agendar.cancelar(usuarioPaciente(), cita.id!);
+      await agendar.cancelar(usuarioPaciente(), cita.id!, motivo);
       expect(cita.estado).toBe(EstadoCita.CANCELADA);
+      expect(cita.motivoCancelacion).toBe(motivo);
       await expect(
         agendar.agendar(usuarioAgendador(), { medicoId: 1, fecha: '2026-11-04', hora: '07:00', pacienteId: 11 }),
       ).resolves.toBeDefined();
     });
 
+    it('el paciente NO puede cancelar con menos de 2 días', async () => {
+      const { agendar, citas } = escenario();
+      const cita = citas.sembrar(1, 10, '2026-11-03', '07:00');
+      await expect(agendar.cancelar(usuarioPaciente(), cita.id!, motivo)).rejects.toThrow(ReglaNegocioError);
+      expect(cita.estado).toBe(EstadoCita.AGENDADA);
+    });
+
+    it('el agendador SÍ puede cancelar a última hora', async () => {
+      const { agendar, citas } = escenario();
+      const cita = citas.sembrar(1, 10, '2026-11-03', '07:00');
+      await agendar.cancelar(usuarioAgendador(), cita.id!, motivo);
+      expect(cita.estado).toBe(EstadoCita.CANCELADA);
+    });
+
     it('OWASP A01: un paciente NO puede cancelar la cita de otro', async () => {
       const { agendar, citas } = escenario();
       const ajena = citas.sembrar(1, 11, '2026-11-04', '07:00');
-      await expect(agendar.cancelar(usuarioPaciente(), ajena.id!)).rejects.toThrow(AccesoDenegadoError);
+      await expect(agendar.cancelar(usuarioPaciente(), ajena.id!, motivo)).rejects.toThrow(AccesoDenegadoError);
     });
 
     it('falla si la cita no existe', async () => {
       const { agendar } = escenario();
-      await expect(agendar.cancelar(usuarioAgendador(), 12345)).rejects.toThrow(RecursoNoEncontradoError);
+      await expect(agendar.cancelar(usuarioAgendador(), 12345, motivo)).rejects.toThrow(RecursoNoEncontradoError);
     });
   });
 });

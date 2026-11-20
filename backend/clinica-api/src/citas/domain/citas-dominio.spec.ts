@@ -16,6 +16,10 @@ import {
 
 // "Ahora" = lunes 2 de noviembre de 2026, 06:00
 const AHORA = { hoy: f('2026-11-02'), horaActual: h('06:00') };
+  // Cita del miércoles 4; "hoy" es el lunes 2 → faltan exactamente 2 días.
+const motivo = 'Viaje de trabajo imprevisto';
+const porPaciente = (hoy = AHORA.hoy, justificacion = motivo) => ({ hoy, justificacion, esAutonoma: true });
+const porPersonal = (hoy = AHORA.hoy, justificacion = motivo) => ({ hoy, justificacion, esAutonoma: false });
 
 describe('Cita (ciclo de vida)', () => {
   const nueva = () =>
@@ -27,25 +31,60 @@ describe('Cita (ciclo de vida)', () => {
     expect(c.estaActiva()).toBe(true);
   });
 
-  it('al cancelarse deja de estar activa (libera el turno)', () => {
+   it('al cancelarse deja de estar activa (libera el turno)', () => {
     const c = nueva();
-    c.cancelar(AHORA.hoy);
+    c.cancelar(porPaciente());
     expect(c.estado).toBe(EstadoCita.CANCELADA);
     expect(c.estaActiva()).toBe(false);
   });
 
+  it('guarda la justificación y la fecha de cancelación (trazabilidad)', () => {
+    const c = nueva();
+    c.cancelar(porPaciente(AHORA.hoy, '  Viaje de trabajo imprevisto  '));
+    expect(c.motivoCancelacion).toBe('Viaje de trabajo imprevisto');
+    expect(c.fechaCancelacion?.toString()).toBe('2026-11-02');
+  });
+
   it('no se puede cancelar dos veces ni cancelar una cita atendida', () => {
     const cancelada = nueva();
-    cancelada.cancelar(AHORA.hoy);
-    expect(() => cancelada.cancelar(AHORA.hoy)).toThrow(ReglaNegocioError);
+    cancelada.cancelar(porPaciente());
+    expect(() => cancelada.cancelar(porPaciente())).toThrow(ReglaNegocioError);
 
     const atendida = nueva();
     atendida.atender();
-    expect(() => atendida.cancelar(AHORA.hoy)).toThrow(ReglaNegocioError);
+    expect(() => atendida.cancelar(porPaciente())).toThrow(ReglaNegocioError);
   });
 
   it('no se puede cancelar una cita de una fecha pasada', () => {
-    expect(() => nueva().cancelar(f('2026-11-05'))).toThrow(ReglaNegocioError);
+    expect(() => nueva().cancelar(porPersonal(f('2026-11-05')))).toThrow(ReglaNegocioError);
+  });
+
+  describe('RF6: anticipación mínima de 2 días', () => {
+    it('el paciente puede cancelar con exactamente 2 días de anticipación', () => {
+      expect(() => nueva().cancelar(porPaciente(f('2026-11-02')))).not.toThrow();
+    });
+
+    it.each(['2026-11-03', '2026-11-04'])('el paciente NO puede cancelar si hoy es %s', (hoy) => {
+      expect(() => nueva().cancelar(porPaciente(f(hoy)))).toThrow(/2 días de anticipación/);
+    });
+
+    it('el personal sí puede cancelar a última hora', () => {
+      expect(() => nueva().cancelar(porPersonal(f('2026-11-04')))).not.toThrow();
+    });
+  });
+
+  describe('RF6: justificación obligatoria', () => {
+    it.each(['', '   ', 'corta'])('rechaza la justificación "%s"', (justificacion) => {
+      expect(() => nueva().cancelar(porPaciente(AHORA.hoy, justificacion))).toThrow(/justificación/);
+    });
+
+    it('rechaza una justificación de más de 500 caracteres', () => {
+      expect(() => nueva().cancelar(porPaciente(AHORA.hoy, 'a'.repeat(501)))).toThrow(/justificación/);
+    });
+
+    it('también la exige cuando cancela el personal', () => {
+      expect(() => nueva().cancelar(porPersonal(AHORA.hoy, ''))).toThrow(/justificación/);
+    });
   });
 
   it('rechaza observaciones demasiado largas', () => {

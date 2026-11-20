@@ -53,8 +53,8 @@ export const citasApi = {
     http.get<SugerenciaCita[]>('/citas/sugerencias', { ...filtro, limite }),
   agendar: (datos: { medicoId: number; fecha: string; hora: string; pacienteId?: number; observacion?: string }) =>
     http.post<CitaCreada>('/citas', datos),
-  cancelar: (id: number) => http.patch<CitaCreada>(`/citas/${id}/cancelar`),
-};
+  cancelar: (id: number, justificacion: string) =>
+    http.patch<CitaCreada>(`/citas/${id}/cancelar`, { justificacion }),};
 
 export const exportacionApi = {
   agenda: (medicoId: number, fecha: string, formato: 'csv' | 'txt') =>

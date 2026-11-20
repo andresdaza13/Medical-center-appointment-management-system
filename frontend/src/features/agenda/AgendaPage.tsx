@@ -7,6 +7,7 @@ import { Alerta, Cargando, SelectorMedico, TablaCitas } from '../../shared/compo
 import { fechaLarga, hoyIso } from '../../shared/fechas';
 import { mensajeDe, useCarga } from '../../shared/hooks';
 import { Icono } from '../../shared/iconos';
+import { ModalCancelarCita } from '../../shared/ModalCancelarCita';
 
 /**
  * RF1: listar las citas de un médico en una fecha (búsqueda con filtros y
@@ -19,6 +20,7 @@ export function AgendaPage() {
   const [medicoId, setMedicoId] = useState<number>();
   const [fecha, setFecha] = useState(hoyIso());
   const [mensaje, setMensaje] = useState<{ tipo: 'error' | 'exito'; texto: string } | null>(null);
+  const [aCancelar, setACancelar] = useState<CitaDetalle | null>(null);
 
   const agenda = useCarga(
     () => (medicoId ? citasApi.agendaDelDia(medicoId, fecha) : Promise.resolve(undefined)),
@@ -35,14 +37,16 @@ export function AgendaPage() {
     }
   };
 
-  const cancelar = async (cita: CitaDetalle) => {
-    if (!confirm(`¿Cancelar la cita de ${cita.paciente.nombreCompleto} a las ${cita.hora}?`)) return;
+  const confirmarCancelacion = async (justificacion: string) => {
+    if (!aCancelar) return;
     try {
-      await citasApi.cancelar(cita.id);
+      await citasApi.cancelar(aCancelar.id, justificacion);
       setMensaje({ tipo: 'exito', texto: 'Cita cancelada. El turno quedó libre.' });
       await agenda.recargar();
     } catch (e) {
       setMensaje({ tipo: 'error', texto: mensajeDe(e) });
+    } finally {
+      setACancelar(null);
     }
   };
 
@@ -53,7 +57,7 @@ export function AgendaPage() {
       <header className="encabezado-pagina">
         <h1>Agenda del día</h1>
         {tieneRol('agendador', 'administrador', 'medico') && (
-                  <Link className="boton" to="/agendar">
+          <Link className="boton" to="/agendar">
             <Icono nombre="mas" /> Nueva cita
           </Link>
         )}
@@ -87,7 +91,7 @@ export function AgendaPage() {
               <strong>{agenda.datos.total}</strong> {agenda.datos.total === 1 ? 'cita' : 'citas'}
             </div>
             <div className="acciones">
-                            <button className="boton secundario" onClick={() => exportar('csv')} disabled={agenda.datos.total === 0}>
+              <button className="boton secundario" onClick={() => exportar('csv')} disabled={agenda.datos.total === 0}>
                 <Icono nombre="descargar" /> Exportar CSV
               </button>
               <button className="boton secundario" onClick={() => exportar('txt')} disabled={agenda.datos.total === 0}>
@@ -103,7 +107,7 @@ export function AgendaPage() {
               puedeCancelar
                 ? (c) =>
                     c.estado === 'AGENDADA' && (
-                      <button className="boton peligro pequeno" onClick={() => cancelar(c)}>
+                      <button className="boton peligro pequeno" onClick={() => setACancelar(c)}>
                         Cancelar
                       </button>
                     )
@@ -111,6 +115,13 @@ export function AgendaPage() {
             }
           />
         </div>
+      )}
+      {aCancelar && (
+        <ModalCancelarCita
+          cita={aCancelar}
+          onConfirmar={confirmarCancelacion}
+          onCerrar={() => setACancelar(null)}
+        />
       )}
     </section>
   );

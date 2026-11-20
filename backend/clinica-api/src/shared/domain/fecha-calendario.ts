@@ -56,6 +56,12 @@ export class FechaCalendario {
     return FechaCalendario.desdeDateUtc(d);
   }
 
+    /** Días de calendario desde esta fecha hasta `otra` (negativo si `otra` es anterior). */
+  diasHasta(otra: FechaCalendario): number {
+    const MS_POR_DIA = 24 * 60 * 60 * 1000;
+    return (otra.toDateUtc().getTime() - this.toDateUtc().getTime()) / MS_POR_DIA;
+  }
+
   /** Años completos transcurridos desde esta fecha hasta `fecha` (útil para la edad). */
   aniosCumplidosEn(fecha: FechaCalendario): number {
     const cumplioEsteAnio = fecha.mes > this.mes || (fecha.mes === this.mes && fecha.dia >= this.dia);

@@ -405,3 +405,16 @@ tr.tachada td { color: var(--texto-3); }
   .encabezado-pagina { align-items: flex-start; flex-direction: column; }
 }
 .primera-mayuscula::first-letter { text-transform: uppercase; }
+
+/* Modal (RF6: justificación al cancelar). Usa <dialog> nativo. */
+.modal {
+  border: none;
+  border-radius: var(--radio-grupo);
+  background: var(--superficie);
+  color: inherit;
+  padding: 1.5rem;
+  width: min(480px, calc(100vw - 2rem));
+}
+.modal::backdrop { background: rgba(0, 0, 0, 0.4); }
+.modal h2 { margin-top: 0; }
+.modal-acciones { display: flex; justify-content: flex-end; gap: 0.5rem; }

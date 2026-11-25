@@ -10,6 +10,7 @@ import { ConfiguracionModule } from './configuracion/configuracion.module';
 import { ExportacionModule } from './exportacion/exportacion.module';
 import { MedicosModule } from './medicos/medicos.module';
 import { PacientesModule } from './pacientes/pacientes.module';
+import { ReportesModule } from './reportes/reportes.module';
 import { DomainExceptionFilter } from './shared/infrastructure/http/domain-exception.filter';
 import { SharedModule } from './shared/shared.module';
 
@@ -34,6 +35,7 @@ import { SharedModule } from './shared/shared.module';
     ConfiguracionModule,
     CitasModule,
     ExportacionModule,
+    ReportesModule,
   ],
   providers: [
     // La cadena de guards se ejecuta en el orden en que se registran.

@@ -13,6 +13,7 @@ import {
   MedicoFechaQuery,
   sugerenciaDto,
   SugerenciasQuery,
+  CancelarCitaDto,
 } from './dto/cita.dto';
 
 @Controller('citas')
@@ -65,9 +66,15 @@ export class CitasController {
     return CitaResponseDto.desde(await this.agendar.agendar(usuario, dto));
   }
 
+  /** RF6: PATCH /citas/:id/cancelar  { "justificacion": "..." } */
   @Patch(':id/cancelar')
   @Roles(Rol.PACIENTE, Rol.AGENDADOR, Rol.ADMINISTRADOR)
-  async cancelar(@UsuarioActual() usuario: UsuarioAutenticado, @Param('id', ParseIntPipe) id: number) {
-    return CitaResponseDto.desde(await this.agendar.cancelar(usuario, id));
+  async cancelar(
+    @UsuarioActual() usuario: UsuarioAutenticado,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CancelarCitaDto,
+  ) {
+    return CitaResponseDto.desde(await this.agendar.cancelar(usuario, id, dto.justificacion));
   }
+  
 }

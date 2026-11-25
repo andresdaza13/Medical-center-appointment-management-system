@@ -93,6 +93,10 @@ model Cita {
   medico      Medico     @relation(fields: [medicoId], references: [id])
   creadoPor   String // username de Keycloak que registró la cita (trazabilidad)
 
+    // RF6: por qué y cuándo se canceló (ambos NULL mientras la cita no se cancele)
+  motivoCancelacion String?   @db.VarChar(500)
+  canceladaEn       DateTime? @db.Date
+
   // CONCURRENCIA (RNF 4): `activa` vale true mientras la cita no esté cancelada
   // y NULL cuando se cancela. PostgreSQL considera distintos los NULL dentro de
   // un índice UNIQUE, así que:

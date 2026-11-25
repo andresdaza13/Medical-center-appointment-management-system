@@ -41,6 +41,8 @@ export class PrismaCitaRepository implements CitaRepository {
       estado: cita.estado,
       observacion: cita.observacion ?? null,
       creadoPor: cita.creadoPor,
+      motivoCancelacion: cita.motivoCancelacion ?? null,
+      canceladaEn: cita.fechaCancelacion?.toDateUtc() ?? null,
       // true = ocupa el turno; null = lo libera (ver comentario en schema.prisma)
       activa: cita.estaActiva() ? true : null,
     };
@@ -75,6 +77,9 @@ export class PrismaCitaRepository implements CitaRepository {
         creadoPor: fila.creadoPor,
       },
       fila.estado as EstadoCita,
+            fila.motivoCancelacion && fila.canceladaEn
+        ? { motivo: fila.motivoCancelacion, fecha: FechaCalendario.desdeDateUtc(fila.canceladaEn) }
+        : undefined,
     );
   }
 }

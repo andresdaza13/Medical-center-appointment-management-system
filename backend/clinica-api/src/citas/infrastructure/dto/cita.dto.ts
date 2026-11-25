@@ -1,10 +1,21 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsISO8601, IsOptional, IsPositive, IsString, Matches, Max, MaxLength, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsISO8601,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Matches,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+} from 'class-validator';
 import { Especialidad } from '../../../medicos/domain/medico';
-import { Cita } from '../../domain/cita';
+import { Cita, JUSTIFICACION_MAX, JUSTIFICACION_MIN } from '../../domain/cita';
 import { FranjaLibre } from '../../domain/calculadora-disponibilidad';
 import { Sugerencia } from '../../application/disponibilidad.service';
-
 const HORA = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 export class AgendarCitaDto {
@@ -87,6 +98,14 @@ export class CitaResponseDto {
       observacion: c.observacion,
     };
   }
+}
+
+/** RF6: cuerpo de PATCH /citas/:id/cancelar */
+export class CancelarCitaDto {
+  @IsString()
+  @MinLength(JUSTIFICACION_MIN)
+  @MaxLength(JUSTIFICACION_MAX)
+  justificacion!: string;
 }
 
 export const franjaDto = (f: FranjaLibre) => ({ fecha: f.fecha.toString(), hora: f.hora.toString() });

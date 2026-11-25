@@ -27,7 +27,15 @@ describe('FechaCalendario', () => {
     expect(b.esPosteriorA(a)).toBe(true);
     expect(a.equals(FechaCalendario.desde('2026-11-02'))).toBe(true);
   });
+  it('cuenta los días de calendario hasta otra fecha', () => {
+    const hoy = FechaCalendario.desde('2026-11-11');
 
+    expect(hoy.diasHasta(FechaCalendario.desde('2026-11-13'))).toBe(2);
+    expect(hoy.diasHasta(hoy)).toBe(0);
+    expect(hoy.diasHasta(FechaCalendario.desde('2026-11-10'))).toBe(-1);
+    // cruza mes y año
+    expect(FechaCalendario.desde('2026-12-30').diasHasta(FechaCalendario.desde('2027-01-02'))).toBe(3);
+  });
   it('ida y vuelta con Date UTC no corre el día (bug clásico de zona horaria)', () => {
     const fecha = FechaCalendario.desde('2026-11-03');
     expect(FechaCalendario.desdeDateUtc(fecha.toDateUtc()).equals(fecha)).toBe(true);

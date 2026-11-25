@@ -12,6 +12,7 @@ import { MedicosModule } from './medicos/medicos.module';
 import { PacientesModule } from './pacientes/pacientes.module';
 import { DomainExceptionFilter } from './shared/infrastructure/http/domain-exception.filter';
 import { SharedModule } from './shared/shared.module';
+import { SaludModule } from './salud/salud.module';
 
 /**
  * Raíz del MONOLITO MODULAR.
@@ -34,6 +35,7 @@ import { SharedModule } from './shared/shared.module';
     ConfiguracionModule,
     CitasModule,
     ExportacionModule,
+    SaludModule,
   ],
   providers: [
     // La cadena de guards se ejecuta en el orden en que se registran.

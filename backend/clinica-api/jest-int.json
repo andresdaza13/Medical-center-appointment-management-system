@@ -1,0 +1,10 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "src",
+  "testRegex": ".*\\.int-spec\\.ts$",
+  "transform": { "^.+\\.ts$": "ts-jest" },
+  "testEnvironment": "node",
+  "globalSetup": "<rootDir>/../test/integracion/preparar-bd.js",
+  "setupFiles": ["<rootDir>/../test/integracion/entorno.js"],
+  "testTimeout": 30000
+}

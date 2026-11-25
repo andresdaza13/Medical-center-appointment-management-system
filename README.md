@@ -1,5 +1,7 @@
 # Piedrazul · Sistema de agendamiento de citas médicas
 
+[![CI](https://github.com/andresdaza13/Medical-center-appointment-management-system/actions/workflows/ci.yml/badge.svg)](https://github.com/andresdaza13/Medical-center-appointment-management-system/actions/workflows/ci.yml)
+
 Aplicación web (SPA + API) para la **Red de Servicios Médicos Piedrazul** (Popayán).
 Proyecto de curso de Ingeniería de Software III, Universidad del Cauca, 2026-2.
 

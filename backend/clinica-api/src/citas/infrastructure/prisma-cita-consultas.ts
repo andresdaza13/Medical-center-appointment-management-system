@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import { FechaCalendario } from '../../shared/domain/fecha-calendario';
 import { PrismaService } from '../../shared/infrastructure/prisma/prisma.service';
 import { EstadoCita } from '../domain/cita';
-import { CitaConsultas, CitaDetalle } from '../domain/cita-consultas';
+import { CitaConsultas, CitaDetalle, ConteoMensual } from '../domain/cita-consultas';
 
 /** Columnas exactas que necesitan las pantallas: ni una más (rendimiento y privacidad). */
 const SELECCION = {
@@ -42,6 +42,35 @@ export class PrismaCitaConsultas implements CitaConsultas {
       orderBy: [{ fecha: 'desc' }, { hora: 'desc' }],
     });
     return filas.map(PrismaCitaConsultas.aDetalle);
+  }
+
+  /**
+   * RF7. La agregación la hace PostgreSQL: devuelve como mucho 12 filas por
+   * médico, en lugar de traer miles de citas para contarlas en Node.
+   *
+   * - Filtra por RANGO de fechas (>= 1 ene y < 1 ene del año siguiente) y no
+   *   con EXTRACT(YEAR FROM fecha) en el WHERE: comparar la columna tal cual
+   *   permite que PostgreSQL use un índice sobre `fecha`; envolverla en una
+   *   función lo obliga a revisar todas las filas.
+   * - Los valores viajan como PARÁMETROS (${...} en el tagged template de
+   *   Prisma), nunca concatenados: eso evita la inyección SQL (OWASP A03).
+   * - `::int` porque COUNT devuelve bigint y EXTRACT numeric en PostgreSQL.
+   */
+  async conteoPorMesYMedico(anio: number): Promise<ConteoMensual[]> {
+    const desde = new Date(Date.UTC(anio, 0, 1));
+    const hasta = new Date(Date.UTC(anio + 1, 0, 1));
+    return this.prisma.$queryRaw<ConteoMensual[]>`
+      SELECT c."medicoId" AS "medicoId",
+             m."nombres" AS "medicoNombre",
+             EXTRACT(MONTH FROM c."fecha")::int AS "mes",
+             COUNT(*)::int AS "cantidad"
+      FROM "Cita" c
+      JOIN "Medico" m ON m."id" = c."medicoId"
+      WHERE c."fecha" >= ${desde}
+        AND c."fecha" < ${hasta}
+        AND c."estado" <> 'CANCELADA'
+      GROUP BY c."medicoId", m."nombres", EXTRACT(MONTH FROM c."fecha")
+      ORDER BY m."nombres", "mes"`;
   }
 
   private static aDetalle(f: FilaDetalle): CitaDetalle {

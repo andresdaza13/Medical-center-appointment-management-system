@@ -31,6 +31,18 @@ export interface CitaDetalle {
   };
 }
 
+/**
+ * RF7: cuántas citas tuvo un médico en un mes. Es una fila de un reporte
+ * agregado: la cuenta la hace la base de datos (GROUP BY), no la aplicación.
+ */
+export interface ConteoMensual {
+  medicoId: number;
+  medicoNombre: string;
+  /** 1 = enero … 12 = diciembre */
+  mes: number;
+  cantidad: number;
+}
+
 /** PUERTO de LECTURA de citas (lado "consulta" de CQRS). */
 export interface CitaConsultas {
   /** RF1: agenda de un médico en una fecha, ordenada por hora. */
@@ -38,6 +50,10 @@ export interface CitaConsultas {
 
   /** RF5: historial completo de un paciente, de la más reciente a la más antigua. */
   delPaciente(pacienteId: number): Promise<CitaDetalle[]>;
+
+  /** RF7: citas no canceladas de un año, agrupadas por médico y mes. Solo trae los
+   *  meses con citas. */
+  conteoPorMesYMedico(anio: number): Promise<ConteoMensual[]>;
 }
 
 export const CITA_CONSULTAS = Symbol('CITA_CONSULTAS');

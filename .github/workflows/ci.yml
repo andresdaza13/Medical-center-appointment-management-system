@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend:
+    name: Backend (Lint, Build, Unit Tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend/clinica-api
+    env:
+      DATABASE_URL: "postgresql://postgres:test@localhost:5432/piedrazul_test"
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './backend/clinica-api/package-lock.json'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Generar Prisma Client
+        run: npx prisma generate
+
+      - name: Linter
+        run: npm run lint
+
+      - name: Compilar
+        run: npm run build
+
+      - name: Pruebas Unitarias
+        run: npm test
+
+  frontend:
+    name: Frontend (Typecheck, Build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Compilar
+        run: npm run build
+
+  backend-integracion:
+    name: Backend (Pruebas de Integración)
+    runs-on: ubuntu-latest
+    needs: [backend] # Solo corre si las unitarias pasan (Pirámide de pruebas)
+    defaults:
+      run:
+        working-directory: ./backend/clinica-api
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: piedrazul_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL_TEST: "postgresql://postgres:test@localhost:5432/piedrazul_test"
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './backend/clinica-api/package-lock.json'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Generar Prisma Client
+        run: npx prisma generate
+
+      - name: Aplicar migraciones a la base de datos de prueba
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL_TEST }} # Prisma migrate usa DATABASE_URL
+
+      - name: Pruebas de Integración
+        run: npm run test:int

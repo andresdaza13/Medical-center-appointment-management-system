@@ -16,6 +16,7 @@ const MENU: Enlace[] = [
   { ruta: '/agendar', texto: 'Agendar cita', icono: 'mas', roles: ['administrador', 'agendador', 'medico', 'paciente'] },
   { ruta: '/mis-citas', texto: 'Mis citas', icono: 'lista', roles: ['paciente'] },
   { ruta: '/historial', texto: 'Historial', icono: 'reloj', roles: ['administrador', 'agendador', 'medico'] },
+  { ruta: '/reportes', texto: 'Reportes', icono: 'grafico', roles: ['administrador', 'medico'] },
   { ruta: '/pacientes/nuevo', texto: 'Nuevo paciente', icono: 'persona', roles: ['administrador', 'agendador', 'medico'] },
   { ruta: '/configuracion', texto: 'Configuración', icono: 'ajustes', roles: ['administrador'] },
 ];

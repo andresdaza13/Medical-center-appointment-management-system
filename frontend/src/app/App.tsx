@@ -8,6 +8,7 @@ import { ConfiguracionPage } from '../features/configuracion/ConfiguracionPage';
 import { HistorialPage } from '../features/historial/HistorialPage';
 import { MisCitasPage } from '../features/mis-citas/MisCitasPage';
 import { CompletarPerfilPage, RegistrarPacientePage, RequierePerfilPaciente } from '../features/pacientes/PacientesPages';
+import { ReportePage } from '../features/reportes/ReportePage';
 import { Layout } from './Layout';
 
 const PERSONAL: Rol[] = ['administrador', 'agendador', 'medico'];
@@ -44,6 +45,7 @@ export function App() {
                   <Route path="pacientes/nuevo" element={<RequiereRol roles={PERSONAL}><RegistrarPacientePage /></RequiereRol>} />
                   <Route path="mis-citas" element={<RequiereRol roles={['paciente']}><MisCitasPage /></RequiereRol>} />
                   <Route path="configuracion" element={<RequiereRol roles={['administrador']}><ConfiguracionPage /></RequiereRol>} />
+                  <Route path="reportes" element={<RequiereRol roles={['administrador', 'medico']}><ReportePage /></RequiereRol>} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </RequierePerfilPaciente>

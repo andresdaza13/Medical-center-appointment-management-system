@@ -4,7 +4,7 @@ import { MedicosService } from '../../medicos/application/medicos.service';
 import { PacientesService } from '../../pacientes/application/pacientes.service';
 import { Reloj, RELOJ } from '../../shared/application/reloj.port';
 import { FechaCalendario } from '../../shared/domain/fecha-calendario';
-import { CITA_CONSULTAS, CitaConsultas, CitaDetalle } from '../domain/cita-consultas';
+import { CITA_CONSULTAS, CitaConsultas, CitaDetalle, ConteoMensual } from '../domain/cita-consultas';
 
 export interface CitaConEdad extends CitaDetalle {
   paciente: CitaDetalle['paciente'] & { edad?: number };
@@ -68,6 +68,11 @@ export class ConsultarCitasService {
   async misCitas(usuario: UsuarioAutenticado): Promise<CitaConEdad[]> {
     const paciente = await this.pacientes.obtenerPerfilPropio(usuario);
     return (await this.consultas.delPaciente(paciente.id!)).map((c) => this.conEdad(c));
+  }
+
+  /** RF7: datos crudos del reporte (los arma el módulo Reportes). */
+  conteoPorMesYMedico(anio: number): Promise<ConteoMensual[]> {
+    return this.consultas.conteoPorMesYMedico(anio);
   }
 
   private conEdad(cita: CitaDetalle): CitaConEdad {

@@ -1,5 +1,5 @@
 import { Cita, EstadoCita } from '../citas/domain/cita';
-import { CitaConsultas, CitaDetalle } from '../citas/domain/cita-consultas';
+import { CitaConsultas, CitaDetalle, ConteoMensual } from '../citas/domain/cita-consultas';
 import { CitaRepository, TurnoOcupado } from '../citas/domain/cita.repository';
 import { ConflictoError } from '../shared/domain/errors';
 import { FechaCalendario } from '../shared/domain/fecha-calendario';
@@ -54,6 +54,20 @@ export class CitaConsultasEnMemoria implements CitaConsultas {
   }
   async delPaciente(pacienteId: number) {
     return this.resultado.filter((c) => c.paciente.id === pacienteId);
+  }
+
+  /** Misma semántica que el GROUP BY de Prisma, pero sobre el arreglo. */
+  async conteoPorMesYMedico(anio: number): Promise<ConteoMensual[]> {
+    const grupos = new Map<string, ConteoMensual>();
+    for (const c of this.resultado) {
+      const fecha = FechaCalendario.desde(c.fecha);
+      if (fecha.anio !== anio || c.estado === EstadoCita.CANCELADA) continue;
+      const clave = `${c.medico.id}-${fecha.mes}`;
+      const grupo = grupos.get(clave) ?? { medicoId: c.medico.id, medicoNombre: c.medico.nombres, mes: fecha.mes, cantidad: 0 };
+      grupo.cantidad++;
+      grupos.set(clave, grupo);
+    }
+    return [...grupos.values()];
   }
 }
 

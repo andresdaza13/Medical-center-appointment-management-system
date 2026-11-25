@@ -9,6 +9,7 @@ import {
   Medico,
   NuevoPaciente,
   Paciente,
+  ReporteCitasPorMes,
   SugerenciaCita,
   SugerenciaPaciente,
   TipoProfesional,
@@ -54,9 +55,19 @@ export const citasApi = {
   agendar: (datos: { medicoId: number; fecha: string; hora: string; pacienteId?: number; observacion?: string }) =>
     http.post<CitaCreada>('/citas', datos),
   cancelar: (id: number, justificacion: string) =>
-    http.patch<CitaCreada>(`/citas/${id}/cancelar`, { justificacion }),};
+    http.patch<CitaCreada>(`/citas/${id}/cancelar`, { justificacion }),
+};
 
 export const exportacionApi = {
   agenda: (medicoId: number, fecha: string, formato: 'csv' | 'txt') =>
     http.descargar('/exportaciones/agenda', { medicoId, fecha, formato }, `citas_${fecha}.${formato}`),
+};
+
+/**
+ * RF7: reporte de citas por mes y médico.
+ * El backend devuelve siempre 12 meses por médico, ordenados alfabéticamente,
+ * y excluye las citas canceladas. Si no se envía `anio`, usa el año en curso.
+ */
+export const reportesApi = {
+  citasPorMes: (anio?: number) => http.get<ReporteCitasPorMes>('/reportes/citas-por-mes', { anio }),
 };

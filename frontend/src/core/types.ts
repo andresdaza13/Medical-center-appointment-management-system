@@ -102,3 +102,20 @@ export interface CitaCreada {
   hora: string;
   estado: EstadoCita;
 }
+
+// --- RF7: reporte de citas por mes y médico -------------------------------
+
+/** Una serie del gráfico: un médico con sus 12 meses (0 = enero … 11 = diciembre). */
+export interface SerieMedico {
+  medicoId: number;
+  medico: string;
+  citasPorMes: number[];
+  total: number;
+}
+
+/** Respuesta de GET /reportes/citas-por-mes?anio=YYYY */
+export interface ReporteCitasPorMes {
+  anio: number;
+  series: SerieMedico[];
+  totalGeneral: number;
+}

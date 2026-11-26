@@ -86,12 +86,14 @@
       "redirectUris": [
         "http://localhost:5173/*"
       ],
+       "redirectUris": ["http://localhost:5173/*", "https://piedrazul-web-7k89.onrender.com/*"],
+"webOrigins": ["http://localhost:5173", "https://piedrazul-web-7k89.onrender.com"],
       "webOrigins": [
         "http://localhost:5173"
       ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "http://localhost:5173/*"
+        "post.logout.redirect.uris": "http://localhost:5173/*##https://piedrazul-web-7k89.onrender.com/*"
       },
       "protocolMappers": [
         {

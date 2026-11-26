@@ -1,0 +1,3 @@
+/*
+  X-Frame-Options: DENY
+  Content-Security-Policy: default-src 'self'; connect-src 'self' https://piedrazul-api-3wnf.onrender.com https://piedrazul-keycloak.onrender.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-ancestors 'none';

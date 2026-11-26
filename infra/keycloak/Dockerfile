@@ -12,8 +12,7 @@ ARG KEYCLOAK_VERSION=26.0
 FROM quay.io/keycloak/keycloak:${KEYCLOAK_VERSION} AS builder
 # Opciones de "build time": quedan fijas dentro de la imagen.
 ENV KC_DB=postgres
-# Un solo nodo: caché local, sin el clúster Infinispan/JGroups (menos memoria).
-ENV KC_CACHE=local
+
 ENV KC_HEALTH_ENABLED=true
 RUN /opt/keycloak/bin/kc.sh build
 
@@ -28,6 +27,12 @@ COPY piedrazul-realm.json /opt/keycloak/data/import/piedrazul-realm.json
 # avisando con las cabeceras X-Forwarded-* que el cliente usó HTTPS.
 ENV KC_HTTP_ENABLED=true
 ENV KC_PROXY_HEADERS=xforwarded
+
+
+
+# Un solo nodo: caché local, sin el clúster Infinispan/JGroups.
+# Es opción de EJECUCIÓN (en la etapa builder Keycloak la ignora).
+ENV KC_CACHE=local
 
 # Memoria de Java ajustada a 512 MB. Sin esto, la JVM calcula el heap como un
 # porcentaje de la memoria y no deja espacio para lo demás (metaspace, hilos).

@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { LoggerModule } from 'nestjs-pino';
+import { randomUUID } from 'crypto';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard, RolesGuard } from './auth/infrastructure/guards';
 import { CitasModule } from './citas/citas.module';
@@ -15,19 +17,26 @@ import { DomainExceptionFilter } from './shared/infrastructure/http/domain-excep
 import { SharedModule } from './shared/shared.module';
 import { SaludModule } from './salud/salud.module';
 
-/**
- * Raíz del MONOLITO MODULAR.
- *
- * Un solo proceso desplegable, pero dividido en módulos por capacidad de
- * negocio (pacientes, médicos, configuración, citas, exportación) con
- * fronteras explícitas. Cada módulo tiene sus capas domain / application /
- * infrastructure.
- */
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate: validarEntorno }),
-    // RNF seguridad / requisito del proyecto 4-ii: limita el uso automatizado.
-    // Máx. 100 peticiones por minuto por IP; los endpoints sensibles bajan este límite.
+    
+    // --- LOGS ESTRUCTURADOS (RNF6) ---
+    LoggerModule.forRoot({
+      pinoHttp: {
+        genReqId: (req) => (req.headers['x-request-id'] as string) || randomUUID(),
+        redact: {
+          paths: ['req.headers.authorization', 'req.headers.cookie', 'req.body.password'],
+          censor: '[REDACTED]',
+        },
+        customProps: (req: any) => {
+          return { user: req.user?.preferred_username || req.user?.sub || 'anon' };
+        },
+        transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty' } : undefined,
+      },
+    }),
+    // ---------------------------------
+
     ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 100 }]),
     SharedModule,
     AuthModule,
@@ -40,7 +49,6 @@ import { SaludModule } from './salud/salud.module';
     SaludModule,
   ],
   providers: [
-    // La cadena de guards se ejecuta en el orden en que se registran.
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },

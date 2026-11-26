@@ -1,0 +1,9 @@
+# Lo que NO se envía a Docker al construir la imagen.
+node_modules
+dist
+coverage
+test
+*.log
+# Los secretos llegan por variables de entorno, nunca dentro de la imagen.
+.env
+.env.*

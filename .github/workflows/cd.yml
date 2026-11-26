@@ -27,7 +27,7 @@ jobs:
           # Se reintenta por 5 minutos (30 intentos de 10 segundos)
           for i in $(seq 1 30); do
             # OJO AQUÍ: Reemplaza esta URL por la real de tu backend en Render
-            if curl -fsS "https://piedrazul-api.onrender.com/api/health"; then
+            if curl -fsS "https://piedrazul-api-3wnf.onrender.com/api/health"; then
               echo "✅ El backend está saludable."
               exit 0
             fi

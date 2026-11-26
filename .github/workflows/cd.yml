@@ -1,0 +1,38 @@
+name: CD (Despliegue Continuo)
+
+on:
+  workflow_run:
+    workflows: ["CI"] # Se activa cuando el workflow 'CI' termina
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Desplegar a Producción
+    runs-on: ubuntu-latest
+    # Solo se ejecuta si el CI fue exitoso y fue en la rama main
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+
+    steps:
+      - name: Disparar Despliegue en Render (Backend)
+        run: |
+          echo "Disparando despliegue en Render..."
+          curl --silent --show-error --fail --request POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+
+      - name: Smoke Test - Verificar que el Backend está vivo
+        run: |
+          echo "Esperando a que el backend esté en línea..."
+          # Se reintenta por 5 minutos (30 intentos de 10 segundos)
+          for i in $(seq 1 30); do
+            # OJO AQUÍ: Reemplaza esta URL por la real de tu backend en Render
+            if curl -fsS "https://piedrazul-api.onrender.com/api/health"; then
+              echo "✅ El backend está saludable."
+              exit 0
+            fi
+            echo "Intento $i/30 fallido. Reintentando en 10 segundos..."
+            sleep 10
+          done
+          echo "❌ El backend no respondió después de 5 minutos."
+          exit 1
